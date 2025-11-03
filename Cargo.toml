@@ -1,5 +1,5 @@
 [package]
-name = "rust_graphics"
+name = "rust_graphics_sandbox"
 edition = "2021"
 rust-version = "1.88"
 publish = false
@@ -13,3 +13,5 @@ bytemuck = "1.22.0"
 gltf = "1.4.1"
 glam = "0.30.9"
 egui = "0.33.0"
+egui-wgpu = { version = "0.33.0", features = ["winit"] }
+egui-winit = "0.33.0"
