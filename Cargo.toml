@@ -1,0 +1,15 @@
+[package]
+name = "rust_graphics"
+edition = "2021"
+rust-version = "1.88"
+publish = false
+
+[dependencies]
+env_logger = "0.11"
+pollster = "0.4"
+wgpu = { version = "27.0.0", features = ["spirv"] }
+winit = { version = "0.30.8" }
+bytemuck = "1.22.0"
+gltf = "1.4.1"
+glam = "0.30.9"
+egui = "0.33.0"
