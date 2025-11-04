@@ -11,7 +11,7 @@ use winit::{
     window::{Window, WindowId},
 };
 
-struct DepthTexture {
+pub struct DepthTexture {
     pub texture: wgpu::Texture,
     pub view: wgpu::TextureView,
 }
@@ -108,8 +108,6 @@ impl State {
         let scale_factor = 1.0;
 
         let depth_texture = create_depth_texture(&device, &surface_config);
-
-        let last_frame = Instant::now();
 
         Self {
             device,
@@ -277,10 +275,12 @@ impl App {
                 .show(state.egui_renderer.context(), |ui| {
                     ui.label(format!("Frame time: {:.2} ms", self.smoothed_dt * 1000.0));
                     ui.separator();
-                    if drag_vec3(ui, "Position", &mut world.camera.eye, 0.1) {
+                    if drag_vec3(ui, "Camera Position: ", &mut world.camera.eye, 0.1) {
                         world.camera.update_uniform();
                     }
-                    ui.label(format!("{:?}", world.camera));
+                    ui.collapsing("Debug", |ui| {
+                        ui.label(format!("{:?}", world.camera));
+                    });
                 });
 
             state.egui_renderer.end_frame_and_draw(

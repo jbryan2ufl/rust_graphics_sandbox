@@ -4,6 +4,9 @@ edition = "2021"
 rust-version = "1.88"
 publish = false
 
+[lints.rust]
+dead_code = "allow"
+
 [dependencies]
 env_logger = "0.11"
 pollster = "0.4"

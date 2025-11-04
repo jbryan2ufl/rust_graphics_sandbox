@@ -2,10 +2,12 @@ use crate::{
     app::State,
     camera::Camera,
     material::{Binding, Material},
-    mesh::{create_test_mesh, load_gltf},
+    // mesh::create_test_mesh,
+    mesh::load_gltf,
     model::Model,
     shader::Shader,
 };
+
 use std::sync::Arc;
 use std::time::Instant;
 
@@ -38,11 +40,11 @@ impl World {
 
         // let test_mesh = create_test_mesh(&state);
         // models.push(Model {
-        //     mesh: test_mesh,
-        //     material: materials.last().unwrap().clone(),
+        //	 mesh: test_mesh,
+        //	 material: materials.last().unwrap().clone(),
         // });
 
-        let test_mesh = load_gltf(&state, "models/Fox.gltf");
+        let test_mesh = load_gltf(&state.device, "models/Fox.gltf");
         models.push(Model {
             mesh: test_mesh.last().unwrap().clone(),
             material: materials.last().unwrap().clone(),

@@ -83,7 +83,7 @@ impl EguiRenderer {
                 .update_texture(device, queue, *id, image_delta);
         }
         self.renderer
-            .update_buffers(device, queue, encoder, &tris, &screen_descriptor);
+            .update_buffers(device, queue, encoder, &tris, screen_descriptor);
         let rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                 view: window_surface_view,
@@ -101,7 +101,7 @@ impl EguiRenderer {
         });
 
         self.renderer
-            .render(&mut rpass.forget_lifetime(), &tris, &screen_descriptor);
+            .render(&mut rpass.forget_lifetime(), &tris, screen_descriptor);
         for x in &full_output.textures_delta.free {
             self.renderer.free_texture(x)
         }

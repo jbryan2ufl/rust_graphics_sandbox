@@ -78,17 +78,17 @@ impl Camera {
 impl fmt::Debug for Camera {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
-            f,
-            "Eye:\n{}\nCenter:\n{}\nUp:\n{}\n\nFOV:\n{}\nZ:\n{:?}\n\nView:\n{}\nProjection:\n{}\n\nUniform:\n{}",
-            self.eye,
-            self.center,
-            self.up,
-            self.fov,
-            [self.z_near, self.z_far,],
-            pretty_mat4(&self.view),
-            pretty_mat4(&self.projection),
-            pretty_array4x4(&self.uniform.view_proj),
-        )
+			f,
+			"Eye:\n{}\nCenter:\n{}\nUp:\n{}\n\nFOV:\n{}\nZ:\n{:?}\n\nView:\n{}\nProjection:\n{}\n\nUniform:\n{}",
+			self.eye,
+			self.center,
+			self.up,
+			self.fov,
+			[self.z_near, self.z_far,],
+			pretty_mat4(&self.view),
+			pretty_mat4(&self.projection),
+			pretty_array4x4(&self.uniform.view_proj),
+		)
     }
 }
 
@@ -102,14 +102,14 @@ fn pretty_mat4(m: &glam::Mat4) -> String {
     let cols = m.to_cols_array_2d();
     let mut s = String::new();
     for row in 0..4 {
-        s.push_str("    ");
+        s.push('\t');
         s.push_str("[ ");
-        for col in 0..4 {
+        (0..4).for_each(|col| {
             s.push_str(&format!("{:8.4}", cols[col][row]));
             if col != 3 {
                 s.push_str(", ");
             }
-        }
+        });
         s.push_str(" ]\n");
     }
     s
@@ -118,13 +118,13 @@ fn pretty_mat4(m: &glam::Mat4) -> String {
 fn pretty_array4x4(m: &[[f32; 4]; 4]) -> String {
     let mut s = String::new();
     for row in 0..4 {
-        s.push_str("    [ ");
-        for col in 0..4 {
+        s.push_str("	[ ");
+        (0..4).for_each(|col| {
             s.push_str(&format!("{:8.4}", m[col][row]));
             if col != 3 {
                 s.push_str(", ");
             }
-        }
+        });
         s.push_str(" ]\n");
     }
     s

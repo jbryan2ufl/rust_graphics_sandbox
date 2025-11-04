@@ -1,4 +1,3 @@
-use crate::app::State;
 use std::sync::Arc;
 use wgpu::util::DeviceExt;
 
@@ -16,7 +15,7 @@ struct Vertex {
     uv: [f32; 2],
 }
 
-pub fn create_test_mesh(state: &State) -> Arc<Mesh> {
+pub fn create_test_mesh(device: &wgpu::Device) -> Arc<Mesh> {
     let verts = [
         Vertex {
             pos: [0.0, 0.5, 0.0],
@@ -35,22 +34,18 @@ pub fn create_test_mesh(state: &State) -> Arc<Mesh> {
         },
     ];
 
-    let vertex_buffer = state
-        .device
-        .create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Vertex Buffer"),
-            contents: bytemuck::cast_slice(&verts),
-            usage: wgpu::BufferUsages::VERTEX,
-        });
+    let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("Vertex Buffer"),
+        contents: bytemuck::cast_slice(&verts),
+        usage: wgpu::BufferUsages::VERTEX,
+    });
 
     let indices = [0, 1, 2];
-    let index_buffer = state
-        .device
-        .create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some("Index Buffer"),
-            contents: bytemuck::cast_slice(&indices),
-            usage: wgpu::BufferUsages::INDEX,
-        });
+    let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("Index Buffer"),
+        contents: bytemuck::cast_slice(&indices),
+        usage: wgpu::BufferUsages::INDEX,
+    });
 
     println!("VERTICES: {:?}", &verts[..3]);
     println!("INDICES: {:?}", &indices[..3]);
@@ -62,19 +57,18 @@ pub fn create_test_mesh(state: &State) -> Arc<Mesh> {
     })
 }
 
-pub fn load_gltf(state: &State, path: &str) -> Vec<Arc<Mesh>> {
+pub fn load_gltf(device: &wgpu::Device, path: &str) -> Vec<Arc<Mesh>> {
     let (doc, buffs, _) = gltf::import(path).unwrap();
     let mut meshes = vec![];
 
     for mesh in doc.meshes() {
         for prim in mesh.primitives() {
-            // ─── vertices (POS + NORMAL + UV) ───
             let reader = prim.reader(|b| Some(&buffs[b.index()]));
 
             let positions: Vec<[f32; 3]> = reader
                 .read_positions()
                 .map(|v| v.collect())
-                .unwrap_or_else(|| vec![]);
+                .unwrap_or_else(Vec::new);
             let normals: Vec<[f32; 3]> = reader
                 .read_normals()
                 .map(|v| v.collect())
@@ -94,16 +88,12 @@ pub fn load_gltf(state: &State, path: &str) -> Vec<Arc<Mesh>> {
                 })
                 .collect();
 
-            let vertex_buffer =
-                state
-                    .device
-                    .create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                        label: Some("Vertex Buffer"),
-                        contents: bytemuck::cast_slice(&verts),
-                        usage: wgpu::BufferUsages::VERTEX,
-                    });
+            let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Vertex Buffer"),
+                contents: bytemuck::cast_slice(&verts),
+                usage: wgpu::BufferUsages::VERTEX,
+            });
 
-            // ─── indices ───
             let indices: Vec<u32> = reader
                 .read_indices()
                 .map(|v| v.into_u32().collect())
@@ -112,13 +102,11 @@ pub fn load_gltf(state: &State, path: &str) -> Vec<Arc<Mesh>> {
             println!("VERTICES: {:?}", &verts[..3]);
             println!("INDICES: {:?}", &indices[..3]);
 
-            let index_buffer = state
-                .device
-                .create_buffer_init(&wgpu::util::BufferInitDescriptor {
-                    label: Some("Index Buffer"),
-                    contents: bytemuck::cast_slice(&indices),
-                    usage: wgpu::BufferUsages::INDEX,
-                });
+            let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: Some("Index Buffer"),
+                contents: bytemuck::cast_slice(&indices),
+                usage: wgpu::BufferUsages::INDEX,
+            });
 
             meshes.push(Arc::new(Mesh {
                 vertex_buffer,
