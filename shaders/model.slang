@@ -6,8 +6,6 @@ cbuffer Camera : register(b0)
 struct VSIn
 {
     float3 pos   : @location(0);
-    float3 norm  : @location(1);
-    float2 uv    : @location(2);
 };
 
 struct VSOut

@@ -13,8 +13,14 @@ pollster = "0.4"
 wgpu = { version = "27.0.0", features = ["spirv"] }
 winit = { version = "0.30.8" }
 bytemuck = "1.22.0"
-gltf = "1.4.1"
 glam = "0.30.9"
 egui = "0.33.0"
 egui-wgpu = { version = "0.33.0", features = ["winit"] }
 egui-winit = "0.33.0"
+bevy_ecs = "0.17.2"
+gltf = "1.4.1"
+crossbeam = "0.8.4"
+instant = "0.1.13"
+serde = "1.0.228"
+simdnoise = "3.1.6"
+wgpu-profiler = "0.25.0"

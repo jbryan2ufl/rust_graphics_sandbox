@@ -11,50 +11,6 @@ pub struct Mesh {
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 struct Vertex {
     pos: [f32; 3],
-    normal: [f32; 3],
-    uv: [f32; 2],
-}
-
-pub fn create_test_mesh(device: &wgpu::Device) -> Arc<Mesh> {
-    let verts = [
-        Vertex {
-            pos: [0.0, 0.5, 0.0],
-            normal: [0.0, 0.0, 1.0],
-            uv: [0.5, 0.0],
-        },
-        Vertex {
-            pos: [-0.5, -0.5, 0.0],
-            normal: [0.0, 0.0, 1.0],
-            uv: [0.0, 1.0],
-        },
-        Vertex {
-            pos: [0.5, -0.5, 0.0],
-            normal: [0.0, 0.0, 1.0],
-            uv: [1.0, 1.0],
-        },
-    ];
-
-    let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Vertex Buffer"),
-        contents: bytemuck::cast_slice(&verts),
-        usage: wgpu::BufferUsages::VERTEX,
-    });
-
-    let indices = [0, 1, 2];
-    let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("Index Buffer"),
-        contents: bytemuck::cast_slice(&indices),
-        usage: wgpu::BufferUsages::INDEX,
-    });
-
-    println!("VERTICES: {:?}", &verts[..3]);
-    println!("INDICES: {:?}", &indices[..3]);
-
-    Arc::new(Mesh {
-        vertex_buffer,
-        index_buffer,
-        index_count: indices.len() as u32,
-    })
 }
 
 pub fn load_gltf(device: &wgpu::Device, path: &str) -> Vec<Arc<Mesh>> {
@@ -65,28 +21,18 @@ pub fn load_gltf(device: &wgpu::Device, path: &str) -> Vec<Arc<Mesh>> {
         for prim in mesh.primitives() {
             let reader = prim.reader(|b| Some(&buffs[b.index()]));
 
-            let positions: Vec<[f32; 3]> = reader
-                .read_positions()
-                .map(|v| v.collect())
-                .unwrap_or_else(Vec::new);
-            let normals: Vec<[f32; 3]> = reader
-                .read_normals()
-                .map(|v| v.collect())
-                .unwrap_or_else(|| vec![[0.0; 3]; positions.len()]);
-            let uvs: Vec<[f32; 2]> = reader
-                .read_tex_coords(0)
-                .map(|v| v.into_f32().collect())
-                .unwrap_or_else(|| vec![[0.0; 2]; positions.len()]);
+            let Some(pos_iter) = reader.read_positions() else {
+                return vec![];
+            };
+            let positions: Vec<[f32; 3]> = pos_iter.collect();
+            if positions.is_empty() {
+                return vec![];
+            }
 
-            let verts: Vec<Vertex> = positions
-                .iter()
-                .enumerate()
-                .map(|(i, &pos)| Vertex {
-                    pos,
-                    normal: normals.get(i).copied().unwrap_or([0.0; 3]),
-                    uv: uvs.get(i).copied().unwrap_or([0.0; 2]),
-                })
-                .collect();
+            let vertex_count = positions.len();
+
+            let mut verts = Vec::<Vertex>::with_capacity(positions.len());
+            (0..vertex_count).for_each(|i| verts.push(Vertex { pos: positions[i] }));
 
             let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
                 label: Some("Vertex Buffer"),

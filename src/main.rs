@@ -3,9 +3,7 @@ mod camera;
 mod egui_renderer;
 mod material;
 mod mesh;
-mod model;
 mod shader;
-mod world;
 
 use winit::event_loop::{ControlFlow, EventLoop};
 
